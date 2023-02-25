@@ -1,7 +1,7 @@
 const app = require("./configs/express");
+const vars = require("./configs/vars");
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Listening on port: ${PORT}`);
+app.listen(vars.port, (err) => {
+  if (err) throw err;
+  console.log(`Listening on port: ${vars.port}`);
 });

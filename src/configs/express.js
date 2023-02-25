@@ -1,12 +1,17 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
+
 const routes = require("../api/routes");
+
 /*
  * Create app
  * @public
- *
  */
 const app = express();
+
+// Enable cors
+app.use(cors());
 
 // Request logging
 app.use(morgan("dev"));

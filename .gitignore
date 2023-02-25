@@ -6,6 +6,10 @@ node_modules
 
 # ignore all .vscode files
 .vscode/
+.vscode-jest
+
+# ignore sequelize setting file
+.sequelizerc
 
 # ignore all temp files
 temp/
