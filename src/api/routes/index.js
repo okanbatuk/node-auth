@@ -1,10 +1,11 @@
 const express = require("express");
-const httpStatus = require("http-status");
-
+const authRoute = require("./auth.route");
 const router = express.Router();
 
 router.get("/status", (req, res, next) => {
-  res.status(httpStatus.OK).json({ message: "Everything is OK" });
+  res.onlyMessage("Everything is OK");
 });
+
+router.use("/", authRoute);
 
 module.exports = router;
