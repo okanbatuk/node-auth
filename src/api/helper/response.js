@@ -6,7 +6,7 @@ const resHelper = (req, res, next = null) => {
     res.json(
       data === null
         ? { success: true, message: message }
-        : { success: true, data: data, message: message }
+        : { success: true, data: data }
     );
   };
 

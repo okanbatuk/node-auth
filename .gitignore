@@ -17,5 +17,5 @@ temp/
 # ignore any rest client files
 *.http
 
-# ignore any log files
-*.log
+# ignore all log files
+logs/

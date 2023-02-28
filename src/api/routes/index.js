@@ -1,11 +1,16 @@
 const express = require("express");
-const authRoute = require("./auth.route");
+const authRoutes = require("./auth.route");
+const userRoutes = require("./user.route");
 const router = express.Router();
 
 router.get("/status", (req, res, next) => {
   res.onlyMessage("Everything is OK");
 });
 
-router.use("/", authRoute);
+// Auth Routes
+router.use("/", authRoutes);
+
+// User Ops Routes
+router.use("/users", userRoutes);
 
 module.exports = router;
