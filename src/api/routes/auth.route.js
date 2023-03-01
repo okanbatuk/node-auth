@@ -1,14 +1,20 @@
-const express = require("express");
-const httpStatus = require("http-status");
-// const resHelper = require("../api/helper/response").helper();
-const router = express.Router();
+const authRoutes = require("express").Router();
+const { validate } = require("express-validation");
+const authController = require("../controllers/auth.controller");
+const authValidations = require("../validations/auth.validations");
 
-router.route("/register").get((req, res, next) => {
-  res.onlyMessage("You're in REGISTER Page");
-});
+authRoutes
+  .route("/register")
+  .get((req, res, next) => {
+    res.onlyMessage("You're in REGISTER Page");
+  })
+  .post(validate(authValidations.registration), authController.register);
 
-router.route("/login").get((req, res, next) => {
-  res.onlyMessage("Hey there,you're in LOGIN Page");
-});
+authRoutes
+  .route("/login")
+  .get((req, res, next) => {
+    res.onlyMessage("Hey there,you're in LOGIN Page");
+  })
+  .post(validate(authValidations.loggedIn), authController.login);
 
-module.exports = router;
+module.exports = authRoutes;
