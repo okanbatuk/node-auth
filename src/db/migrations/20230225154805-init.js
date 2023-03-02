@@ -14,25 +14,31 @@ module.exports = {
         defaultValue: DataTypes.UUIDV4,
       },
       firstName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(40),
+        allowNull: false,
       },
       lastName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(40),
+        allowNull: false,
       },
       email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
         unique: true,
       },
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      refreshToken: { type: DataTypes.STRING, allowNull: true },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
       },
       created_at: {
-        allowNull: false,
         type: DataTypes.DATE,
       },
       updated_at: {
-        allowNull: false,
         type: DataTypes.DATE,
       },
     });

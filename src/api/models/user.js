@@ -18,18 +18,21 @@ module.exports = (sequelize, DataTypes) => {
   User.init(
     {
       uuid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 },
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      email: { type: DataTypes.STRING, allowNull: false },
-      password: { type: DataTypes.STRING, allowNull: false },
+      firstName: { type: DataTypes.STRING(40), allowNull: false },
+      lastName: { type: DataTypes.STRING(40), allowNull: false },
+      email: { type: DataTypes.STRING(50), allowNull: false },
+      password: { type: DataTypes.STRING(100), allowNull: false },
+      refreshToken: { type: DataTypes.STRING, allowNull: true },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       created_at: {
         type: DataTypes.DATE,
-        allowNull: false,
         defaultValue: new Date(),
       },
       updated_at: {
         type: DataTypes.DATE,
-        allowNull: false,
         defaultValue: new Date(),
       },
     },

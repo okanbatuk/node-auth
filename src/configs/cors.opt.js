@@ -1,11 +1,12 @@
-let whitelist = ["http://localhost:3000", "http://127.0.0.1:3000"];
+const allowed = require("./cors.allowed");
+const APIError = require("../api/helper/errors/APIError");
 
 module.exports.corsOpt = {
   origin: (origin, callback) => {
-    if (!origin || whitelist.indexOf(origin) !== -1) {
+    if (!origin || allowed.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error("not allowed by CORS"));
+      callback(new APIError("not allowed by CORS"));
     }
   },
   optionsSuccessStatus: 200,
