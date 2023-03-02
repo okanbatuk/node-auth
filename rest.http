@@ -1,0 +1,44 @@
+###
+GET http://localhost:3000/api/status
+
+###
+GET http://localhost:3000/api/login
+
+###
+GET http://localhost:3000/api/register
+
+###
+GET http://localhost:3000/api/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2Nzc3ODUyODMsImV4cCI6MTY3Nzc4NTMxM30.Gioes92ADUzSvQP_cTS2otowuqACel-lor4wP6goP3U
+
+
+###
+GET http://localhost:3000/api/users/
+
+
+### 
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "firstName": "test",
+  "lastName": "test",
+  "email": "test@example.com",
+  "password": "A!1234"
+}
+
+### 
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "A!1234"
+}
+
+###
+GET http://localhost:3000/api/refresh
+
+###
+GET http://localhost:3000/api/logout
+

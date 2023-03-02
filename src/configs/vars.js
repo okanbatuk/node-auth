@@ -11,4 +11,6 @@ module.exports = {
   host: process.env.DB_HOST,
   username: process.env.DB_USERNAME,
   database: process.env.DB_DATABASE,
+  ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
 };
