@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models").user;
 const vars = require("../../configs/vars");
-const tokenProvider = require("../utils/passport");
+const tokenProvider = require("../utils/generateTokens");
 
 //#region Registration
 /*
@@ -75,7 +75,12 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     let isMatch = false;
+    let cookies = req.cookies;
     let { email, password } = req.body;
+    let user = {};
+    let newAccessToken = undefined;
+    let newRefreshToken = undefined;
+    let newRefreshTokenArray = [];
 
     // Find user according to email and state of active
     let { count, rows } = await User.findAndCountAll({
@@ -83,40 +88,68 @@ exports.login = async (req, res, next) => {
       limit: 1,
     });
 
+    count <= 0 &&
+      next({ message: "User Not Found", status: httpStatus.NOT_FOUND });
+
     if (count > 0) {
+      user = rows[0];
+
       // Compare password with passwd of found user
-      isMatch = await bcrypt.compare(password, rows[0].password);
+      isMatch = await bcrypt.compare(password, user.password);
 
       // TOKEN Generating
-      let accessToken = undefined,
-        refreshToken = undefined;
+      if (isMatch) {
+        newAccessToken = await tokenProvider.generateAccessToken({
+          email: user.email,
+        });
+        newRefreshToken = await tokenProvider.generateRefreshToken({
+          email: user.email,
+        });
+      }
 
-      isMatch &&
-        (accessToken = await tokenProvider.generateAccessToken({
-          email: rows[0].email,
-        })),
-        (refreshToken = await tokenProvider.generateRefreshToken({
-          email: rows[0].email,
-        }));
+      /*
+       * if tokens are generated successfully
+       *
+       * check cookies
+       *
+       * if cookies is not exist, there is no problem.
+       *    Give the new refresh token and go.
+       * if cookies and cookies jwt is exist, there is an old refresh token
+       *    Delete the old token and go
+       */
+      newAccessToken &&
+        newRefreshToken &&
+        (newRefreshTokenArray = !cookies?.jwt
+          ? user.refreshToken
+          : user.refreshToken &&
+            user.refreshToken.filter((token) => token !== cookies.jwt));
 
-      accessToken && refreshToken && (rows[0].refreshToken = refreshToken);
+      cookies?.jwt &&
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          // sameSite: "None",
+          // secure: true,
+        });
 
-      await rows[0].save();
+      user.refreshToken = newRefreshTokenArray
+        ? [...newRefreshTokenArray, newRefreshToken]
+        : [newRefreshToken];
+      await user.save();
 
-      accessToken && refreshToken
-        ? (res.cookie("jwt", refreshToken, {
-            httpOnly: true,
-            sameSite: "None",
-            secure: true,
-            maxAge: 24 * 60 * 60 * 1000,
-          }),
-          res.respond({ accessToken }))
-        : next({
-            message: "Email or password incorrect",
-            status: httpStatus.UNAUTHORIZED,
-          });
-    } else {
-      next({ message: "User Not Found", status: httpStatus.NOT_FOUND });
+      if (newAccessToken && newRefreshToken) {
+        res.cookie("jwt", newRefreshToken, {
+          httpOnly: true,
+          // sameSite: "None",
+          // secure: true,
+          maxAge: 24 * 60 * 60 * 1000,
+        }),
+          res.respond({ accessToken: newAccessToken });
+      } else {
+        next({
+          message: "Email or password incorrect",
+          status: httpStatus.UNAUTHORIZED,
+        });
+      }
     }
   } catch (error) {
     next(error);
@@ -131,6 +164,10 @@ exports.login = async (req, res, next) => {
  */
 exports.regenerateToken = async (req, res, next) => {
   const cookies = req.cookies;
+  let user = {};
+  let newAccessToken = undefined;
+  let newRefreshToken = undefined;
+  let newRefreshTokenArray = [];
 
   // if cookies is exist check jwt in cookies
   if (!cookies || !cookies.jwt)
@@ -138,7 +175,11 @@ exports.regenerateToken = async (req, res, next) => {
       message: "Cookie was not provided",
       status: httpStatus.UNAUTHORIZED,
     });
-  const refreshToken = cookies.jwt;
+  const refreshToken = [cookies.jwt];
+
+  res.clearCookie("jwt", {
+    httpOnly: true /* sameSite: "None", secure: true */,
+  });
 
   // find user according to refresh token
   const { count, rows } = await User.findAndCountAll({
@@ -146,31 +187,79 @@ exports.regenerateToken = async (req, res, next) => {
     limit: 1,
   });
 
-  count > 0 &&
+  if (count > 0) {
+    user = rows[0];
+    newRefreshTokenArray = user.refreshToken.filter(
+      (t) => t !== refreshToken[0]
+    );
+
     jwt.verify(
-      refreshToken,
+      refreshToken[0],
       vars.REFRESH_TOKEN_SECRET,
       async (err, decoded) => {
-        if (err)
+        if (err) {
+          // the token is exist in db but its expired
+          user.refreshToken = [...newRefreshTokenArray];
+          await user.save();
           return next({
-            message: "Token was not recognized",
+            message: "Token is expired",
             status: httpStatus.UNAUTHORIZED,
           });
-        if (rows[0].email !== decoded.email)
+        }
+        if (user.email !== decoded.email)
           return next({
             message: "UNAUTHORIZED",
             status: httpStatus.UNAUTHORIZED,
           });
 
-        // generate access token
-        let accessToken = await tokenProvider.generateAccessToken({
-          email: rows[0].email,
+        // Refresh token is still valid so generate access token
+        newAccessToken = await tokenProvider.generateAccessToken({
+          email: user.email,
         });
-        accessToken && res.respond({ accessToken });
+
+        // create new refresh token because current token was used
+        newRefreshToken = await tokenProvider.generateRefreshToken({
+          email: user.email,
+        });
+        user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+        await user.save();
+
+        // set new refresh token to jwt cookie
+        newAccessToken && newRefreshToken
+          ? (res.cookie("jwt", newRefreshToken, {
+              httpOnly: true,
+              // secure: true,
+              // sameSite: "None",
+            }),
+            res.respond({ newAccessToken }))
+          : next({
+              message: "Generation of Tokens failed",
+              status: httpStatus.INTERNAL_SERVER_ERROR,
+            });
       }
     );
+  }
+
+  // Detected refresh token reuse !!!
+  // token is invalid or expired
   count <= 0 &&
-    next({ message: "User Not Found", status: httpStatus.NOT_FOUND });
+    (jwt.verify(
+      refreshToken[0],
+      vars.REFRESH_TOKEN_SECRET,
+      async (err, decoded) => {
+        if (err)
+          return next({
+            message: "Something went wrong",
+            status: httpStatus.FORBIDDEN,
+          });
+        let hackedUser = await User.findOne({
+          where: { email: decoded.email },
+        });
+        hackedUser.refreshToken = [];
+        await hackedUser.save();
+      }
+    ),
+    next({ message: "FORBIDDEN", status: httpStatus.FORBIDDEN }));
 };
 //#endregion
 
@@ -181,7 +270,7 @@ exports.logout = async (req, res, next) => {
   // if cookies is exist check jwt in cookies
   if (!cookies || !cookies.jwt)
     return res.onlyMessage("No Content", httpStatus.NO_CONTENT);
-  const refreshToken = cookies.jwt;
+  const refreshToken = [cookies.jwt];
 
   // find users according to refresh token
   const { count, rows } = await User.findAndCountAll({
@@ -189,16 +278,25 @@ exports.logout = async (req, res, next) => {
     limit: 1,
   });
 
-  // user not found
-  count <= 0 &&
-    (res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true }),
-    res.onlyMessage("No Content", httpStatus.NO_CONTENT));
-
   // delete the user's refresh token if user is exists
-  count > 0 &&
-    ((rows[0].refreshToken = ""),
-    await rows[0].save(),
-    res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true }),
-    res.onlyMessage("Logged out successfully", httpStatus.OK));
+  if (count > 0) {
+    let user = rows[0];
+    user.refreshToken = user.refreshToken.filter((t) => t !== refreshToken[0]);
+    await user.save();
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      // sameSite: "None",
+      // secure: true,
+    });
+    res.onlyMessage("Logged out successfully", httpStatus.OK);
+  }
+
+  // user not found
+  // TODO: check the user not found section
+  count <= 0 &&
+    (res.clearCookie("jwt", {
+      httpOnly: true /* sameSite: "None", secure: true  */,
+    }),
+    res.onlyMessage("No Content", httpStatus.NO_CONTENT));
 };
 //#endregion

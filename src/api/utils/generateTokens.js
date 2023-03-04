@@ -8,11 +8,11 @@ const vars = require("../../configs/vars");
  **/
 exports.generateAccessToken = async (userInfo) => {
   return new Promise((resolve, reject) => {
-    let accessToken = jwt.sign(userInfo, vars.ACCESS_TOKEN_SECRET, {
+    let newAccessToken = jwt.sign(userInfo, vars.ACCESS_TOKEN_SECRET, {
       expiresIn: "30s",
     });
-    accessToken
-      ? resolve(accessToken)
+    newAccessToken
+      ? resolve(newAccessToken)
       : reject({ error: true, message: "Something went wrong!" });
   });
 };
@@ -25,11 +25,11 @@ exports.generateAccessToken = async (userInfo) => {
  * */
 exports.generateRefreshToken = async (userInfo) => {
   return new Promise((resolve, reject) => {
-    let refreshToken = jwt.sign(userInfo, vars.REFRESH_TOKEN_SECRET, {
+    let newRefreshToken = jwt.sign(userInfo, vars.REFRESH_TOKEN_SECRET, {
       expiresIn: "1d",
     });
-    refreshToken
-      ? resolve(refreshToken)
+    newRefreshToken
+      ? resolve(newRefreshToken)
       : reject({ error: true, message: "Something went wrong!" });
   });
 };

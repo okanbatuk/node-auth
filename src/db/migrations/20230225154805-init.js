@@ -30,7 +30,10 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      refreshToken: { type: DataTypes.STRING, allowNull: true },
+      refreshToken: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+      },
       isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

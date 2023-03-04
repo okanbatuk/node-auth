@@ -8,6 +8,7 @@ module.exports = {
     database: database,
     host: host,
     dialect: "postgres",
+    logging: false,
   },
   test: {
     username: "postgres",
@@ -15,6 +16,7 @@ module.exports = {
     database: "testdb",
     host: "127.0.0.1",
     dialect: "postgres",
+    logging: false,
   },
   production: {
     username: "postgres",
@@ -22,5 +24,6 @@ module.exports = {
     database: "testdb",
     host: "127.0.0.1",
     dialect: "postgres",
+    logging: false,
   },
 };

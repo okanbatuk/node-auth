@@ -4,6 +4,7 @@ exports.credentials = (req, res, next) => {
   const origin = req.headers.origin;
 
   allowedOrigins.includes(origin) &&
+    res.header("Access-Control-Allow-Origin", origin) &&
     res.header("Access-Control-Allow-Credentials", true);
   next();
 };

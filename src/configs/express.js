@@ -22,7 +22,7 @@ const app = express();
 app.use(logger);
 
 // fetch cookies credentials
-app.use(credentials);
+// app.use(credentials);
 
 // Enable Cross Origin Resource Sharing
 app.use(cors(corsOpt));
