@@ -90,7 +90,7 @@ exports.updatePassword = async (req, res, next) => {
 
     user = await findUserByUuid(uuid);
     await checkPassword(password, user.password);
-    
+
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
     res.onlyMessage("User password successfully updated");
@@ -107,13 +107,12 @@ exports.updatePassword = async (req, res, next) => {
 exports.deleteUser = async (req, res, next) => {
   try {
     let { uuid } = req.params;
-    user = await findUserByUuid(uuid);
 
-    user
-      ? ((user.isActive = false),
-        await user.save(),
-        res.onlyMessage("User successfully deleted"))
-      : next({ message: "User not found", status: httpStatus.NOT_FOUND });
+    user = await findUserByUuid(uuid);
+    user.isActive = false;
+    await user.save();
+
+    res.onlyMessage("User successfully deleted");
   } catch (error) {
     next(error);
   }
