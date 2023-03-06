@@ -386,6 +386,32 @@ describe("Integration tests for user api", () => {
         status: httpStatus.NOT_FOUND,
       });
     });
+
+    it("should be successfully deleted", async () => {
+      res = await request(app)
+        .delete(`/api/users/${dbUser.uuid}`)
+        .set("Authorization", `Bearer ${accessToken}`);
+
+      delete existUser.firstName;
+      delete existUser.lastName;
+      let failedLogin = await request(app)
+        .post("/api/login")
+        .set("content-type", "application/json")
+        .send(existUser);
+
+      expect(res.status).toEqual(httpStatus.OK);
+      expect(res.body).toEqual({
+        success: true,
+        message: "User successfully deleted",
+      });
+
+      expect(failedLogin.status).toEqual(httpStatus.NOT_FOUND);
+      expect(failedLogin.body).toEqual({
+        success: false,
+        message: "User Not Found",
+        status: httpStatus.NOT_FOUND,
+      });
+    });
   });
 });
 

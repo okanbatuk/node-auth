@@ -7,14 +7,40 @@ GET http://localhost:3000/api/login
 ###
 GET http://localhost:3000/api/register
 
-###
-GET http://localhost:3000/api/users/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2Nzc5NDE5MjIsImV4cCI6MTY3Nzk0MTk1Mn0.WX8GxKDWe6fP9TnYJrvC4vQqAfb9PihLWgBmOZvgsTs
+### Get user info by uuid
+GET http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDMwMTcsImV4cCI6MTY3ODA0MzA0N30.0YkwwsqdfkcwHv9qaZEx1BB3hVOg03OSBE-QR92X_xA
+
+### get all users
+GET http://localhost:3000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwOTQ5MTgsImV4cCI6MTY3ODA5NDk0OH0.d_d0I-Q9M-iEKQZ4rzTzmpPEf-bHtlYQfKtX63pfA_M
+
+### update user info
+POST http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDUyNDYsImV4cCI6MTY3ODA0NTI3Nn0.HijcG2ieRG7ecolvoq77UkBnKWCnXYY42BGGJ9l9PCw
+
+{
+  "lastName": "Doe"
+}
+
+### update user info
+POST http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDUwMDcsImV4cCI6MTY3ODA0NTAzN30.EZ4FQJFzM68AkkdqVuAhoVn-UYR6I9wAbJoEJ07nwCY
+
+{
+  "email":"john@example.com"
+}
 
 ###
-GET http://localhost:3000/api/users/
+POST http://localhost:3000/api/users/update-password/090ccfc6-1932-443b-89f8-79cb89f35c9e
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDkxNzgsImV4cCI6MTY3ODA0OTIwOH0.-byikI-E-gpWK6ZVnOx0MNyEjPuWJgcgAEMcYpvQYXI
 
+{
 
+}
 ### 
 POST http://localhost:3000/api/register
 Content-Type: application/json
@@ -27,6 +53,17 @@ Content-Type: application/json
 }
 
 ### 
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "firstName": "admin",
+  "lastName": "admin",
+  "email": "admin@example.com",
+  "password": "Admin!.123321"
+}
+
+### 
 POST http://localhost:3000/api/login
 Content-Type: application/json
 
@@ -34,6 +71,8 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "A!1234"
 }
+  ###"password": "Admin!.123321"
+   
 
 ###
 GET http://localhost:3000/api/refresh
