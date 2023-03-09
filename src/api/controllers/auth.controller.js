@@ -3,6 +3,7 @@
 const httpStatus = require("http-status");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { createClient } = require("redis");
 
 const User = require("../models").user;
 const vars = require("../../configs/vars");
@@ -12,6 +13,10 @@ let user = {};
 let newRefreshTokenArray = [];
 let newAccessToken = undefined;
 let newRefreshToken = undefined;
+
+// Create a client and connect to Redis with the client
+const redisClient = createClient();
+(async () => await redisClient.connect())();
 
 //#region Registration
 /*
@@ -83,32 +88,28 @@ exports.login = async (req, res, next) => {
       email: user.email,
     });
 
+    // Add new refresh token to redis cache memory 
+    await redisClient
+      .multi()
+      .sAdd(user.uuid, newRefreshToken)
+      .expire(user.uuid, 24 * 60 * 60)
+      .exec();
+
     /*
      *
-     * if cookies is not exist, there is no problem.
+     * if cookie doesnt exist, there is no problem.
      *    Give the new refresh token and go.
      *
-     * if cookies and cookies jwt is exist, there is an old refresh token
+     * if cookies and cookies jwt exist, there is an old refresh token
      *    Delete the old token and go
      */
-    newRefreshTokenArray = !cookies?.jwt
-      ? user.refreshToken
-      : user.refreshToken &&
-        user.refreshToken.filter((token) => token !== cookies.jwt);
-
-    // if cookie is exist, delete the old token
     cookies?.jwt &&
-      res.clearCookie("jwt", {
+      (res.clearCookie("jwt", {
         httpOnly: true,
         // sameSite: "None",
         // secure: true,
-      });
-
-    // add new refresh token to db
-    user.refreshToken = newRefreshTokenArray
-      ? [...newRefreshTokenArray, newRefreshToken]
-      : [newRefreshToken];
-    await user.save();
+      }),
+      await redisClient.sRem(user.uuid, cookies.jwt));
 
     // add refresh token to cookie
     res.cookie("jwt", newRefreshToken, {
@@ -146,6 +147,7 @@ exports.regenerateToken = async (req, res, next) => {
     httpOnly: true /* sameSite: "None", secure: true */,
   });
 
+  
   // find user according to refresh token
   const { count, rows } = await User.findAndCountAll({
     where: { refreshToken },
