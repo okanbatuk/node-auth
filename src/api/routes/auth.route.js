@@ -48,7 +48,9 @@ authRoutes
  *
  * Geneate Access Token according to refresh token in cookies
  */
-authRoutes.route("/refresh").get(authController.regenerateToken);
+authRoutes
+  .route("/refresh/:uuid")
+  .get(validate(authValidations.paramsVal), authController.regenerateToken);
 //#endregion
 
 //#region /api/logout
