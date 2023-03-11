@@ -10,7 +10,9 @@ The project includes Access Token and Refresh Token lifecycles.
     * Express-validation 
     * Joi
 * Authorization => Jsonwebtoken
-* Database => PostgreSQL
+* Database 
+    * PostgreSQL
+    * Redis 
 * ORM => Sequelize
 * Tests
     * Jest 
