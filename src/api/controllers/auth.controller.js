@@ -3,22 +3,16 @@
 const httpStatus = require("http-status");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { createClient } = require("redis");
+const redisClient = require("../../configs/redis.con");
 
 const User = require("../models").user;
 const vars = require("../../configs/vars");
 const tokenProvider = require("../utils/generateTokens");
 
 let user = {};
-let newRefreshTokenArray = [];
 let newAccessToken = undefined;
 let newRefreshToken = undefined;
 
-// Create a client and connect to Redis with the client
-const redisClient = createClient();
-(async () => await redisClient.connect())();
-
-//#region Registration
 /*
  *
  * @body
@@ -37,7 +31,7 @@ exports.register = async (req, res, next) => {
     let { email, password, firstName, lastName } = req.body;
 
     // Check the email in db
-    await findUserByEmail(email.toLowerCase());
+    await checkEmail(email.toLowerCase());
 
     // new user ll be created
     let newUser = await User.create({
@@ -55,9 +49,7 @@ exports.register = async (req, res, next) => {
     next(error);
   }
 };
-//#endregion
 
-//#region Login section
 /*
  *
  * @body
@@ -75,7 +67,7 @@ exports.login = async (req, res, next) => {
     let { email, password } = req.body;
 
     // Find user according to email and state of active
-    user = await checkUserByEmail(email.toLowerCase());
+    user = await findUserByEmail(email.toLowerCase());
 
     // Compare password with passwd of found user
     await comparePassword(password, user.password);
@@ -88,7 +80,7 @@ exports.login = async (req, res, next) => {
       email: user.email,
     });
 
-    // Add new refresh token to redis cache memory 
+    // Add new refresh token to redis cache memory
     await redisClient
       .multi()
       .sAdd(user.uuid, newRefreshToken)
@@ -118,19 +110,18 @@ exports.login = async (req, res, next) => {
       // secure: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.respond({ accessToken: newAccessToken });
+    res.respond({ uuid: user.uuid, accessToken: newAccessToken });
   } catch (error) {
     next(error);
   }
 };
-//#endregion
 
-//#region Geneate Access Token according to refresh token in cookies
 /*
  *
- * @public GET /api/refresh
+ * @public GET /api/refresh/:uuid
  */
 exports.regenerateToken = async (req, res, next) => {
+  let { uuid } = req.params;
   const cookies = req.cookies;
 
   // if cookies is exist check jwt in cookies
@@ -140,58 +131,48 @@ exports.regenerateToken = async (req, res, next) => {
       status: httpStatus.UNAUTHORIZED,
     });
 
-  const refreshToken = [cookies.jwt];
+  const refreshToken = cookies.jwt;
 
   // delete token to be used
   res.clearCookie("jwt", {
     httpOnly: true /* sameSite: "None", secure: true */,
   });
 
-  
-  // find user according to refresh token
-  const { count, rows } = await User.findAndCountAll({
-    where: { refreshToken },
-    limit: 1,
-  });
+  // check if user.uuid has refresh token
+  let { members } = await redisClient.sScan(uuid, 0, { MATCH: refreshToken });
 
-  if (count > 0) {
-    user = rows[0];
-    newRefreshTokenArray = user.refreshToken.filter(
-      (t) => t !== refreshToken[0]
-    );
+  if (members.length > 0) {
+    // remove the used token
+    await redisClient.sRem(uuid, refreshToken);
 
+    // find user according to refresh token
     jwt.verify(
-      refreshToken[0],
+      refreshToken,
       vars.REFRESH_TOKEN_SECRET,
       async (err, decoded) => {
+        // the token is expired
         if (err) {
-          // the token is exist in db but its expired
-          user.refreshToken = [...newRefreshTokenArray];
-          await user.save();
           return next({
             message: "Token is expired",
             status: httpStatus.UNAUTHORIZED,
           });
         }
-        if (user.email !== decoded.email)
-          return next({
-            message: "UNAUTHORIZED",
-            status: httpStatus.UNAUTHORIZED,
-          });
-
         // Refresh token is still valid so generate access token
         newAccessToken = await tokenProvider.generateAccessToken({
-          email: user.email,
+          email: decoded.email,
         });
 
         // create new refresh token because current token was used
         newRefreshToken = await tokenProvider.generateRefreshToken({
-          email: user.email,
+          email: decoded.email,
         });
 
         // add new refresh token next to other tokens
-        user.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-        await user.save();
+        await redisClient
+          .multi()
+          .sAdd(uuid, newRefreshToken)
+          .expire(uuid, 24 * 60 * 60)
+          .exec();
 
         // set new refresh token to jwt cookie
         res.cookie("jwt", newRefreshToken, {
@@ -203,37 +184,43 @@ exports.regenerateToken = async (req, res, next) => {
       }
     );
   } else {
-    // Detected refresh token reuse !!!
-    // token is invalid or expired
+    // find the hacked user
     jwt.verify(
-      refreshToken[0],
+      refreshToken,
       vars.REFRESH_TOKEN_SECRET,
       async (err, decoded) => {
         if (err)
           return next({
-            message: "Something went wrong",
+            message: "FORBIDDEN",
             status: httpStatus.FORBIDDEN,
           });
-        let hackedUser = await User.findOne({
-          where: { email: decoded.email },
+
+        // find user according to decoded token
+        const user = await User.findOne({ where: { email: decoded.email } });
+
+        // tokens of found user should be deleted
+        await redisClient.DEL(user.uuid);
+        next({
+          message: "FORBIDDEN",
+          status: httpStatus.FORBIDDEN,
         });
-        hackedUser.refreshToken = [];
-        await hackedUser.save();
       }
     );
-    next({ message: "FORBIDDEN", status: httpStatus.FORBIDDEN });
   }
 };
-//#endregion
 
-//#region Logout Process
+/*
+ *
+ * @public GET /api/logout
+ */
 exports.logout = async (req, res, next) => {
   const cookies = req.cookies;
 
   // if cookies is exist check jwt in cookies
   if (!cookies || !cookies.jwt)
     return res.onlyMessage("No Content", httpStatus.NO_CONTENT);
-  const refreshToken = [cookies.jwt];
+
+  const refreshToken = cookies.jwt;
 
   // delete the token
   res.clearCookie("jwt", {
@@ -241,28 +228,27 @@ exports.logout = async (req, res, next) => {
   });
 
   // find users according to refresh token
-  const { count, rows } = await User.findAndCountAll({
-    where: { refreshToken },
-    limit: 1,
+  jwt.verify(refreshToken, vars.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+    if (err)
+      return next({ message: "No Content", status: httpStatus.NO_CONTENT });
+
+    // find user according to decoded token
+    const user = await findUserByEmail(decoded.email);
+
+    // tokens of found user should be deleted
+    let count = await redisClient.sCard(user.uuid);
+
+    count > 1
+      ? await redisClient.sRem(user.uuid, refreshToken)
+      : await redisClient.del(user.uuid);
+
+    res.onlyMessage("Logged out successfully", httpStatus.OK);
   });
-
-  // delete the user's refresh token if user is exists
-  count > 0 &&
-    ((user = rows[0]),
-    (user.refreshToken = user.refreshToken.filter(
-      (t) => t !== refreshToken[0]
-    )),
-    await user.save(),
-    res.onlyMessage("Logged out successfully", httpStatus.OK));
-
-  // user not found
-  count <= 0 && res.onlyMessage("No Content", httpStatus.NO_CONTENT);
 };
-//#endregion
 
 // find user according to sent email
-const findUserByEmail = async (email) => {
-  let { count, rows } = await User.findAndCountAll({
+const checkEmail = async (email) => {
+  let { count } = await User.findAndCountAll({
     where: { email },
     limit: 1,
   });
@@ -278,7 +264,7 @@ const findUserByEmail = async (email) => {
 };
 
 // check user according to sent email
-const checkUserByEmail = async (email) => {
+const findUserByEmail = async (email) => {
   let { count, rows } = await User.findAndCountAll({
     where: { email: email, isActive: true },
     limit: 1,

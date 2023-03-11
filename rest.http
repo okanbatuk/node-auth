@@ -13,7 +13,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZ
 
 ### get all users
 GET http://localhost:3000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwOTQ5MTgsImV4cCI6MTY3ODA5NDk0OH0.d_d0I-Q9M-iEKQZ4rzTzmpPEf-bHtlYQfKtX63pfA_M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2Nzg1MzYxMTUsImV4cCI6MTY3ODUzNjE0NX0.TrXgE8fd8a6tDIjgExba1W1syINCGy-tpwwlVFFv14E
 
 ### update user info
 POST http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
@@ -75,7 +75,7 @@ Content-Type: application/json
    
 
 ###
-GET http://localhost:3000/api/refresh
+GET http://localhost:3000/api/refresh/e47c3c4a-ae41-4054-a16b-b80c12bc5397
 
 ###
 GET http://localhost:3000/api/logout
