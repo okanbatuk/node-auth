@@ -2,6 +2,7 @@ const request = require("supertest");
 const httpStatus = require("http-status");
 const app = require("../../../configs/express");
 const { sequelize, user: User } = require("../../models");
+const redisClient = require("../../../configs/redis.con");
 
 describe("Integration tests for the auth API", () => {
   let res;
@@ -41,13 +42,22 @@ describe("Integration tests for the auth API", () => {
       lastName: "admin",
     };
 
+    // destroy the user table and db in redis
+    await redisClient.flushDb();
     await User.destroy({ truncate: true });
+
+    // create one user
     await User.create(dbUser);
   });
 
   afterAll(async () => {
+    // destroy the user table and close the con of postgres
     await User.destroy({ truncate: true });
     await sequelize.close();
+
+    // destroy the db in redis and close the con
+    await redisClient.flushDb();
+    await redisClient.quit();
   });
 
   describe("GET /", () => {
@@ -140,15 +150,20 @@ describe("Integration tests for the auth API", () => {
       expect(setCookie).toBe(true);
       expect(res.status).toEqual(httpStatus.OK);
       expect(res.body).toEqual({
-        data: { accessToken: expect.any(String) },
+        data: { uuid: expect.any(String), accessToken: expect.any(String) },
         success: true,
       });
+
+      let check = await redisClient.exists(dbUser.uuid);
+      expect(check).toBeGreaterThan(0);
     });
   });
 
-  describe("GET /api/refresh", () => {
+  describe("GET /api/refresh/:uuid", () => {
     it("should be returned unauthorized status with message if req.cookie does not exist", async () => {
-      res = await request(app).get("/api/refresh");
+      res = await request(app).get(
+        "/api/refresh/ee7c6b76-61a1-461f-8391-447531bf5078"
+      );
 
       expect(res.status).toEqual(httpStatus.UNAUTHORIZED);
       expect(res.body).toEqual({
