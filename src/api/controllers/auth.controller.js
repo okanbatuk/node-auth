@@ -9,10 +9,6 @@ const User = require("../models").user;
 const vars = require("../../configs/vars");
 const tokenProvider = require("../utils/generateTokens");
 
-let user = {};
-let newAccessToken = undefined;
-let newRefreshToken = undefined;
-
 /*
  *
  * @body
@@ -33,12 +29,14 @@ exports.register = async (req, res, next) => {
     // Check the email in db
     await checkEmail(email.toLowerCase());
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // new user ll be created
     let newUser = await User.create({
       firstName: firstName,
       lastName: lastName,
       email: email.toLowerCase(),
-      password: await bcrypt.hash(password, 10),
+      password: hashedPassword,
     });
 
     res.onlyMessage(
@@ -67,17 +65,21 @@ exports.login = async (req, res, next) => {
     let { email, password } = req.body;
 
     // Find user according to email and state of active
-    user = await findUserByEmail(email.toLowerCase());
+    const user = await findUserByEmail(email.toLowerCase());
 
     // Compare password with passwd of found user
     await comparePassword(password, user.password);
 
     // TOKEN Generating
-    newAccessToken = await tokenProvider.generateAccessToken({
+    let newAccessToken = await tokenProvider.generateAccessToken({
+      uuid: user.uuid,
       email: user.email,
+      role: user.role,
     });
-    newRefreshToken = await tokenProvider.generateRefreshToken({
+    let newRefreshToken = await tokenProvider.generateRefreshToken({
+      uuid: user.uuid,
       email: user.email,
+      role: user.role,
     });
 
     // Add new refresh token to redis cache memory
@@ -158,13 +160,17 @@ exports.regenerateToken = async (req, res, next) => {
           });
         }
         // Refresh token is still valid so generate access token
-        newAccessToken = await tokenProvider.generateAccessToken({
+        let newAccessToken = await tokenProvider.generateAccessToken({
+          uuid: decoded.uuid,
           email: decoded.email,
+          role: decoded.role,
         });
 
         // create new refresh token because current token was used
-        newRefreshToken = await tokenProvider.generateRefreshToken({
+        let newRefreshToken = await tokenProvider.generateRefreshToken({
+          uuid: decoded.uuid,
           email: decoded.email,
+          role: decoded.role,
         });
 
         // add new refresh token next to other tokens
@@ -232,15 +238,12 @@ exports.logout = async (req, res, next) => {
     if (err)
       return next({ message: "No Content", status: httpStatus.NO_CONTENT });
 
-    // find user according to decoded token
-    const user = await findUserByEmail(decoded.email);
-
     // tokens of found user should be deleted
-    let count = await redisClient.sCard(user.uuid);
+    let count = await redisClient.sCard(decoded.uuid);
 
     count > 1
-      ? await redisClient.sRem(user.uuid, refreshToken)
-      : await redisClient.del(user.uuid);
+      ? await redisClient.sRem(decoded.uuid, refreshToken)
+      : await redisClient.del(decoded.uuid);
 
     res.onlyMessage("Logged out successfully", httpStatus.OK);
   });

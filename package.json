@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "clear && node src/server.js",
+    "dev": "clear ** nodemon src/server.js",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "author": "myrnz",
