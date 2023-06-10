@@ -22,9 +22,9 @@ module.exports = (sequelize, DataTypes) => {
       lastName: { type: DataTypes.STRING(40), allowNull: false },
       email: { type: DataTypes.STRING(50), allowNull: false },
       password: { type: DataTypes.STRING(100), allowNull: false },
-      refreshToken: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: true,
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: "user",
       },
       isActive: {
         type: DataTypes.BOOLEAN,

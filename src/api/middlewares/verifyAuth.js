@@ -17,7 +17,11 @@ module.exports = (req, res, next) => {
     ? jwt.verify(token, vars.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err)
           return next({ message: err.message, status: httpStatus.FORBIDDEN }); //invalid token
-        req.user = decoded.email;
+        req.user = {
+          uuid: decoded.uuid,
+          email: decoded.email,
+          role: decoded.role,
+        };
         next();
       })
     : next({

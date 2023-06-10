@@ -2,9 +2,8 @@
 const httpStatus = require("http-status");
 const bcrypt = require("bcrypt");
 const User = require("../models").user;
-
-let user = null;
-let users = [];
+const { Op } = require("sequelize");
+const redisClient = require("../../configs/redis.con");
 
 /*
  * Get all users
@@ -12,7 +11,7 @@ let users = [];
  * @public GET /api/users
  */
 exports.getAllUsers = async (req, res, next) => {
-  users = await User.findAll();
+  const users = await User.findAll();
   res.respond({ count: users.length, users: users });
 };
 
@@ -24,9 +23,9 @@ exports.getAllUsers = async (req, res, next) => {
 exports.getUserByUuid = async (req, res, next) => {
   try {
     let { uuid } = req.params;
-    user = await findUserByUuid(uuid);
+    const user = await findUserByUuid(uuid);
 
-    user && res.respond({ users: [user] });
+    res.respond({ user: [user] });
   } catch (error) {
     next(error);
   }
@@ -44,23 +43,38 @@ exports.getUserByUuid = async (req, res, next) => {
 exports.updateInfo = async (req, res, next) => {
   try {
     let { uuid } = req.params;
+    let { role } = req.user;
     let { email, firstName, lastName } = req.body;
-    let conflictUser = undefined;
+    const { jwt: refreshToken } = req.cookies;
 
     // if user not found in db, function throws a reject message as user NOT FOUND
-    user = await findUserByUuid(uuid);
+    const user = await findUserByUuid(uuid);
 
     /*
      *
      * if there is an email field function checks the db.
      * there is a conflict user function throws a reject message as CONFLICT
      * */
-    email && (conflictUser = await findUserByEmail(email));
+    email && (await findUserByEmail(uuid, email));
 
     // if there are fields for email or firstName or lastName, update them
-    email && (user.email = email);
+    if (email && role === "user") {
+      // delete the token
+      res.clearCookie("jwt", {
+        httpOnly: true /* sameSite: "None", secure: true  */,
+      });
+
+      // tokens of found user should be deleted
+      let count = await redisClient.sCard(uuid);
+
+      count > 1
+        ? await redisClient.sRem(uuid, refreshToken)
+        : await redisClient.del(uuid);
+    }
+
     firstName && (user.firstName = firstName);
     lastName && (user.lastName = lastName);
+    email && (user.email = email);
 
     // if there is a update operation throws a resolve message as updated
     email || firstName || lastName
@@ -88,7 +102,7 @@ exports.updatePassword = async (req, res, next) => {
     let { uuid } = req.params;
     let { password, newPassword } = req.body;
 
-    user = await findUserByUuid(uuid);
+    const user = await findUserByUuid(uuid);
     await checkPassword(password, user.password);
 
     user.password = await bcrypt.hash(newPassword, 10);
@@ -108,7 +122,7 @@ exports.deleteUser = async (req, res, next) => {
   try {
     let { uuid } = req.params;
 
-    user = await findUserByUuid(uuid);
+    const user = await findUserByUuid(uuid);
     user.isActive = false;
     await user.save();
 
@@ -121,7 +135,9 @@ exports.deleteUser = async (req, res, next) => {
 // find user according to sent uuid
 const findUserByUuid = async (uuid) => {
   let { count, rows } = await User.findAndCountAll({
-    where: { uuid, isActive: true },
+    where: {
+      [Op.and]: [{ uuid }, { isActive: true }],
+    },
     limit: 1,
   });
 
@@ -132,16 +148,18 @@ const findUserByUuid = async (uuid) => {
   });
 };
 
-// find user according to sent uuid
-const findUserByEmail = async (email) => {
+// find user according to sent uuid with email
+const findUserByEmail = async (uuid, email) => {
+  let conflict = false;
   let { count, rows } = await User.findAndCountAll({
-    where: { email, isActive: true },
+    where: { [Op.and]: [{ email }, { isActive: true }] },
     limit: 1,
   });
 
+  count && rows[0].uuid !== uuid && (conflict = true);
   return new Promise((resolve, reject) => {
-    count === 0
-      ? resolve(undefined)
+    !conflict
+      ? resolve()
       : reject({
           message: "Email has already been used",
           status: httpStatus.CONFLICT,

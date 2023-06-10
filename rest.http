@@ -8,38 +8,50 @@ GET http://localhost:3000/api/login
 GET http://localhost:3000/api/register
 
 ### Get user info by uuid
-GET http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDMwMTcsImV4cCI6MTY3ODA0MzA0N30.0YkwwsqdfkcwHv9qaZEx1BB3hVOg03OSBE-QR92X_xA
+GET http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
 
 ### get all users
 GET http://localhost:3000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2Nzg1MzYxMTUsImV4cCI6MTY3ODUzNjE0NX0.TrXgE8fd8a6tDIjgExba1W1syINCGy-tpwwlVFFv14E
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
 
 ### update user info
-POST http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
+POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDUyNDYsImV4cCI6MTY3ODA0NTI3Nn0.HijcG2ieRG7ecolvoq77UkBnKWCnXYY42BGGJ9l9PCw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
 
 {
+  "email":"john@example.com",
+  "firstName": "John",
   "lastName": "Doe"
 }
 
 ### update user info
-POST http://localhost:3000/api/users/f6dcce4e-a264-46fe-913a-ec634ccf1fc5
+POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDUwMDcsImV4cCI6MTY3ODA0NTAzN30.EZ4FQJFzM68AkkdqVuAhoVn-UYR6I9wAbJoEJ07nwCY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
 
 {
-  "email":"john@example.com"
+  "email":"john1@example.com"
+}
+
+### update user info
+POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
+
+{
+
 }
 
 ###
-POST http://localhost:3000/api/users/update-password/090ccfc6-1932-443b-89f8-79cb89f35c9e
+POST http://localhost:3000/api/users/update-password/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzgwNDkxNzgsImV4cCI6MTY3ODA0OTIwOH0.-byikI-E-gpWK6ZVnOx0MNyEjPuWJgcgAEMcYpvQYXI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjQxNjUwNSwiZXhwIjoxNjg2NDE3MTA1fQ.6mX_HqgbRPIvwE-hW6WV347elim6i74W9_zSPrOF7lw
 
 {
-
+  "password": "A!1234",
+  "newPassword": "A!12345"
 }
 ### 
 POST http://localhost:3000/api/register
@@ -68,14 +80,22 @@ POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
-  "password": "A!1234"
+  "email": "john@example.com",
+  "password": "A!12345"
 }
-  ###"password": "Admin!.123321"
+
+### 
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin!.123321"
+}
    
 
 ###
-GET http://localhost:3000/api/refresh/e47c3c4a-ae41-4054-a16b-b80c12bc5397
+GET http://localhost:3000/api/refresh/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 
 ###
 GET http://localhost:3000/api/logout

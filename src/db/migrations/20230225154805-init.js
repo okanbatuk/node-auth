@@ -30,9 +30,9 @@ module.exports = {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
-      refreshToken: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: true,
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: "user",
       },
       isActive: {
         type: DataTypes.BOOLEAN,
