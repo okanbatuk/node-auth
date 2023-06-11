@@ -112,7 +112,7 @@ exports.login = async (req, res, next) => {
       // secure: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-    res.respond({ uuid: user.uuid, accessToken: newAccessToken });
+    res.respond({ user, accessToken: newAccessToken });
   } catch (error) {
     next(error);
   }

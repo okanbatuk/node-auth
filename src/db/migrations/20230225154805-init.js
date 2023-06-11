@@ -31,7 +31,7 @@ module.exports = {
         allowNull: false,
       },
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         defaultValue: "user",
       },
       isActive: {
