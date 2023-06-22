@@ -9,16 +9,16 @@ GET http://localhost:3000/api/register
 
 ### Get user info by uuid
 GET http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 ### get all users
 GET http://localhost:3000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 ### update user info
 POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 {
   "email":"john@example.com",
@@ -29,7 +29,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2Z
 ### update user info
 POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 {
   "email":"john1@example.com"
@@ -38,7 +38,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2Z
 ### update user info
 POST http://localhost:3000/api/users/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 {
 
@@ -47,7 +47,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2Z
 ###
 POST http://localhost:3000/api/users/update-password/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiNzgzNmE2ZjItZDE3ZS00ZDU3LThjYTAtZWRmM2I3MjJkZTVkIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NjUwMzAxNiwiZXhwIjoxNjg2NTAzMDQ2fQ.GxsUl9J2wITHuHn2nMLkWvIlYtrJONdKp8522rwR6mA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMDZiNDcwY2YtZDY4MC00Yzg1LWE0NGQtZjdkODQ1MzAzOGM4IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTY4NzQ1NDczMywiZXhwIjoxNjg3NDU0NzYzfQ.bmy8p5IpBuEeXWQCVFmUQf_PvxYT_NZOgtoKOgZVvDg
 
 {
   "password": "A!1234",
@@ -81,7 +81,7 @@ Content-Type: application/json
 
 {
   "email": "john@example.com",
-  "password": "A!12345"
+  "password": "John!1"
 }
 
 ### 
@@ -90,12 +90,12 @@ Content-Type: application/json
 
 {
   "email": "admin@example.com",
-  "password": "Admin!.123321"
+  "password": "Admin!1"
 }
    
 
 ###
-GET http://localhost:3000/api/refresh/4de4ed79-a3c8-4efc-b2bf-498c50ab95b3
+GET http://localhost:3000/api/refresh/06b470cf-d680-4c85-a44d-f7d8453038c8
 
 ###
 GET http://localhost:3000/api/logout
