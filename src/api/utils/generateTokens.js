@@ -9,7 +9,7 @@ const vars = require("../../configs/vars");
 exports.generateAccessToken = async (userInfo) => {
   return new Promise((resolve, reject) => {
     let newAccessToken = jwt.sign(userInfo, vars.ACCESS_TOKEN_SECRET, {
-      expiresIn: "30s",
+      expiresIn: "10s",
     });
     newAccessToken
       ? resolve(newAccessToken)
