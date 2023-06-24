@@ -100,16 +100,16 @@ exports.login = async (req, res, next) => {
     cookies?.jwt &&
       (res.clearCookie("jwt", {
         httpOnly: true,
-        sameSite: "None",
         secure: true,
+        sameSite: "none",
       }),
       await redisClient.sRem(user.uuid, cookies.jwt));
 
     // add refresh token to cookie
     res.cookie("jwt", newRefreshToken, {
       httpOnly: true,
-      sameSite: "None",
       secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.respond({ user, accessToken: newAccessToken });
@@ -138,8 +138,8 @@ exports.regenerateToken = async (req, res, next) => {
   // delete token to be used
   res.clearCookie("jwt", {
     httpOnly: true,
-    sameSite: "None",
     secure: true,
+    sameSite: "none",
   });
 
   // check if user.uuid has refresh token
@@ -186,7 +186,7 @@ exports.regenerateToken = async (req, res, next) => {
         res.cookie("jwt", newRefreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "None",
+          sameSite: "none",
         });
         res.respond({ accessToken: newAccessToken });
       }
@@ -233,8 +233,8 @@ exports.logout = async (req, res, next) => {
   // delete the token
   res.clearCookie("jwt", {
     httpOnly: true,
-    sameSite: "None",
     secure: true,
+    sameSite: "none",
   });
 
   // find users according to refresh token

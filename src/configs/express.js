@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 
 const routes = require("../api/routes");
@@ -9,6 +10,7 @@ const logger = require("../api/middlewares/logging").logger();
 const resHelper = require("../api/helper/response").helper();
 const { corsOpt } = require("./cors.opt");
 const { credentials } = require("../api/middlewares/credentials");
+const { headerOpt } = require("../api/middlewares/headerOpt");
 
 const { handler, converter, notFound } = errors;
 
@@ -27,10 +29,17 @@ app.use(credentials);
 // Enable Cross Origin Resource Sharing
 app.use(cors(corsOpt));
 
+// allow the app to use cookieparser
+app.use(helmet());
+
+// parse cookie
+app.use(cookieParser());
+
 // parse body params to req.body
 app.use(bodyParser.json());
 
-app.use(cookieParser());
+// Enable to use credentials
+app.use(headerOpt);
 
 // response handler
 app.use(resHelper);
