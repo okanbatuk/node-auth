@@ -123,7 +123,6 @@ exports.login = async (req, res, next) => {
  * @public GET /api/refresh/:uuid
  */
 exports.regenerateToken = async (req, res, next) => {
-  let { uuid } = req.params;
   const cookies = req.cookies;
 
   // if cookies is exist check jwt in cookies
@@ -142,79 +141,47 @@ exports.regenerateToken = async (req, res, next) => {
     sameSite: "none",
   });
 
-  // check if user.uuid has refresh token
-  let { members } = await redisClient.sScan(uuid, 0, { MATCH: refreshToken });
-
-  if (members.length > 0) {
+  // find user according to refresh token
+  jwt.verify(refreshToken, vars.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+    // the token is expired
+    if (err) {
+      return next({
+        message: "Token is expired",
+        status: httpStatus.UNAUTHORIZED,
+      });
+    }
     // remove the used token
-    await redisClient.sRem(uuid, refreshToken);
+    await redisClient.sRem(decoded.uuid, refreshToken);
 
-    // find user according to refresh token
-    jwt.verify(
-      refreshToken,
-      vars.REFRESH_TOKEN_SECRET,
-      async (err, decoded) => {
-        // the token is expired
-        if (err) {
-          return next({
-            message: "Token is expired",
-            status: httpStatus.UNAUTHORIZED,
-          });
-        }
-        // Refresh token is still valid so generate access token
-        let newAccessToken = await tokenProvider.generateAccessToken({
-          uuid: decoded.uuid,
-          email: decoded.email,
-          role: decoded.role,
-        });
+    // Refresh token is still valid so generate access token
+    let newAccessToken = await tokenProvider.generateAccessToken({
+      uuid: decoded.uuid,
+      email: decoded.email,
+      role: decoded.role,
+    });
 
-        // create new refresh token because current token was used
-        let newRefreshToken = await tokenProvider.generateRefreshToken({
-          uuid: decoded.uuid,
-          email: decoded.email,
-          role: decoded.role,
-        });
+    // create new refresh token because current token was used
+    let newRefreshToken = await tokenProvider.generateRefreshToken({
+      uuid: decoded.uuid,
+      email: decoded.email,
+      role: decoded.role,
+    });
 
-        // add new refresh token next to other tokens
-        await redisClient
-          .multi()
-          .sAdd(uuid, newRefreshToken)
-          .expire(uuid, 24 * 60 * 60)
-          .exec();
+    // add new refresh token next to other tokens
+    await redisClient
+      .multi()
+      .sAdd(decoded.uuid, newRefreshToken)
+      .expire(decoded.uuid, 24 * 60 * 60)
+      .exec();
 
-        // set new refresh token to jwt cookie
-        res.cookie("jwt", newRefreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        });
-        res.respond({ accessToken: newAccessToken });
-      }
-    );
-  } else {
-    // find the hacked user
-    jwt.verify(
-      refreshToken,
-      vars.REFRESH_TOKEN_SECRET,
-      async (err, decoded) => {
-        if (err)
-          return next({
-            message: "FORBIDDEN",
-            status: httpStatus.FORBIDDEN,
-          });
-
-        // find user according to decoded token
-        const user = await User.findOne({ where: { email: decoded.email } });
-
-        // tokens of found user should be deleted
-        await redisClient.DEL(user.uuid);
-        next({
-          message: "FORBIDDEN",
-          status: httpStatus.FORBIDDEN,
-        });
-      }
-    );
-  }
+    // set new refresh token to jwt cookie
+    res.cookie("jwt", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.respond({ accessToken: newAccessToken });
+  });
 };
 
 /*
