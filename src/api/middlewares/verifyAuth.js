@@ -19,7 +19,6 @@ module.exports = (req, res, next) => {
           return next({ message: err.message, status: httpStatus.FORBIDDEN }); //invalid token
         req.user = {
           uuid: decoded.uuid,
-          email: decoded.email,
           role: decoded.role,
         };
         next();
