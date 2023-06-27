@@ -10,7 +10,6 @@ const logger = require("../api/middlewares/logging").logger();
 const resHelper = require("../api/helper/response").helper();
 const { corsOpt } = require("./cors.opt");
 const { credentials } = require("../api/middlewares/credentials");
-const { headerOpt } = require("../api/middlewares/headerOpt");
 
 const { handler, converter, notFound } = errors;
 
@@ -37,9 +36,6 @@ app.use(cookieParser());
 
 // parse body params to req.body
 app.use(bodyParser.json());
-
-// Enable to use credentials
-app.use(headerOpt);
 
 // response handler
 app.use(resHelper);
