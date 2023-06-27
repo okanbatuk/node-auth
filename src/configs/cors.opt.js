@@ -3,7 +3,7 @@ const APIError = require("../api/helper/errors/APIError");
 
 module.exports.corsOpt = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new APIError("not allowed by CORS"));
