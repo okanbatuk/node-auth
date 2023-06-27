@@ -37,9 +37,9 @@ function jsonFormat(tokens, req, res) {
 const getClientIp = (req) => {
   return req.headers["x-forwarded-for"]
     ? req.headers["x-forwarded-for"].split(",")[0]
-    : req.socket.remoteAddress.split(":")[3] ||
-        req.connection.remoteAddress ||
-        req.connection.socket.remoteAddress;
+    : req.ip ||
+        req.socket.remoteAddress.split(":")[3] ||
+        req.connection.remoteAddress;
 };
 
 const logger = () => {

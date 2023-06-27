@@ -19,6 +19,8 @@ const { handler, converter, notFound } = errors;
  */
 const app = express();
 
+app.set("trust proxy", true);
+
 // Request logging
 app.use(logger);
 
