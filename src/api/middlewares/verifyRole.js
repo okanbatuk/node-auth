@@ -3,9 +3,9 @@
 const httpStatus = require("http-status");
 
 const verifyUser = (req, res, next) => {
-  const { uuid, role } = req.user;
+  const { uuid, roles } = req.user;
 
-  uuid === req.params.uuid || role === "admin"
+  uuid === req.params.uuid || roles === "admin"
     ? next()
     : next({
         message: "You're not authorized",
@@ -14,9 +14,9 @@ const verifyUser = (req, res, next) => {
 };
 
 const verifyAdmin = (req, res, next) => {
-  const { role } = req.user;
+  const { roles } = req.user;
 
-  role === "admin"
+  roles === "admin"
     ? next()
     : next({
         message: "You don't have permission",

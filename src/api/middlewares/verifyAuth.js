@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
           return next({ message: err.message, status: httpStatus.FORBIDDEN }); //invalid token
         req.user = {
           uuid: decoded.uuid,
-          role: decoded.role,
+          roles: decoded.roles,
         };
         next();
       })

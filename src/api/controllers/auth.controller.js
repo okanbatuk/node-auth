@@ -160,13 +160,13 @@ exports.regenerateToken = async (req, res, next) => {
         // Refresh token is still valid so generate access token
         let newAccessToken = await tokenProvider.generateAccessToken({
           uuid: decoded.uuid,
-          roles: decoded.role,
+          roles: decoded.roles,
         });
 
         // create new refresh token because current token was used
         let newRefreshToken = await tokenProvider.generateRefreshToken({
           uuid: decoded.uuid,
-          roles: decoded.role,
+          roles: decoded.roles,
         });
 
         // add new refresh token next to other tokens
