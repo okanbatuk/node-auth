@@ -73,11 +73,11 @@ exports.login = async (req, res, next) => {
     // TOKEN Generating
     let newAccessToken = await tokenProvider.generateAccessToken({
       uuid: user.uuid,
-      role: user.role,
+      roles: user.role,
     });
     let newRefreshToken = await tokenProvider.generateRefreshToken({
       uuid: user.uuid,
-      role: user.role,
+      roles: user.role,
     });
 
     // Add new refresh token to redis cache memory
@@ -160,13 +160,13 @@ exports.regenerateToken = async (req, res, next) => {
         // Refresh token is still valid so generate access token
         let newAccessToken = await tokenProvider.generateAccessToken({
           uuid: decoded.uuid,
-          role: decoded.role,
+          roles: decoded.role,
         });
 
         // create new refresh token because current token was used
         let newRefreshToken = await tokenProvider.generateRefreshToken({
           uuid: decoded.uuid,
-          role: decoded.role,
+          roles: decoded.role,
         });
 
         // add new refresh token next to other tokens
