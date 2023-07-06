@@ -67,6 +67,8 @@ exports.login = async (req, res, next) => {
     // Find user according to email and state of active
     const user = await findUserByEmail(email.toLowerCase());
 
+    !user.isActive && ((user.isActive = true), await user.save());
+
     // Compare password with passwd of found user
     await comparePassword(password, user.password);
 
@@ -268,7 +270,7 @@ const findUserById = async (uuid) => {
 // check user according to sent email
 const findUserByEmail = async (email) => {
   let { count, rows } = await User.findAndCountAll({
-    where: { email: email, isActive: true },
+    where: { email: email },
     limit: 1,
   });
 
