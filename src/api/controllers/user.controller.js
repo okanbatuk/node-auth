@@ -126,6 +126,15 @@ exports.deleteUser = async (req, res, next) => {
     user.isActive = false;
     await user.save();
 
+    // delete the token
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    await redisClient.del(uuid);
+
     res.onlyMessage("User successfully deleted");
   } catch (error) {
     next(error);
